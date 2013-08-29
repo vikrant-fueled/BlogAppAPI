@@ -34,6 +34,7 @@ class BlogDraft(models.Model):
 	title = models.CharField(max_length=200, null=False)
 	created = models.DateTimeField(auto_now_add=True)
 	body = models.TextField(null=False)
+	published = models.BooleanField(default=False)
 
 	def __unicode__(self):
 		return '%s by %s - [Draft date: %s]' % (self.title, self.post.user, self.created)
@@ -54,8 +55,9 @@ class BlogDraft(models.Model):
 		post = self.post
 		post.title = self.title
 		post.body = self.body
+		self.published = True
 		post.save()
-		return 'Draft has been succesfully published as : %s' % (post.title)
+		return 'Draft has been succesfully published as %s' % (post.title)
 
 class Comment(models.Model):
 	user = models.ForeignKey(User, null=False)
