@@ -28,7 +28,7 @@ class BlogPost(models.Model):
 	def __unicode__(self):
 		return '%s by %s [ Published? : %s ]' % (self.title, self.user, self.published)
 
-class BlogDraft(models.Model):
+class PostDraft(models.Model):
 	user = models.ForeignKey(User, null=False)
 	post = models.ForeignKey(BlogPost)
 	title = models.CharField(max_length=200, null=False)
@@ -42,12 +42,12 @@ class BlogDraft(models.Model):
 	def save(self, *args, **kwargs):
 		if self.pk is None:
 			if hasattr(self, 'post'):
-				super(BlogDraft, self).save(*args, **kwargs) # Call the "real" save() method.
+				super(PostDraft, self).save(*args, **kwargs) # Call the "real" save() method.
 			else:
 				new_post = BlogPost(user=self.user, title=self.title, body=self.body, published=False)
 				new_post.save()
 				self.post = new_post
-				super(BlogDraft, self).save(*args, **kwargs) # Call the "real" save() method.
+				super(PostDraft, self).save(*args, **kwargs) # Call the "real" save() method.
 		else:
 			return 'You are not allowed to overwrite a draft. Please create a new one'
 
