@@ -18,5 +18,62 @@ class UserProfile(models.Model):
 	def __unicode__(self):
 		return '%s' % self.user
 
+class BlogPost(models.Model):
+	user = models.ForeignKey(User)
+	title = models.CharField(max_length=200, null=False)
+	created = models.DateTimeField(auto_now_add=True)
+	body = models.TextField(null=False)
+	updated = models.DateTimeField(auto_now=True)
 
-	
+	def __unicode__(self):
+		return '%s by %s [ Published? : %s ]' % (self.title, self.user, self.published)
+
+class PostDraft(models.Model):
+	user = models.ForeignKey(User, null=False)
+	post = models.ForeignKey(BlogPost)
+	title = models.CharField(max_length=200, null=False)
+	created = models.DateTimeField(auto_now_add=True)
+	body = models.TextField(null=False)
+	published = models.BooleanField(default=False)
+
+	def __unicode__(self):
+		return '%s by %s - [Draft date: %s]' % (self.title, self.post.user, self.created)
+
+	def save(self, *args, **kwargs):
+		if self.pk is None:
+			if hasattr(self, 'post'):
+				super(PostDraft, self).save(*args, **kwargs) # Call the "real" save() method.
+			else:
+				new_post = BlogPost(user=self.user, title=self.title, body=self.body, published=False)
+				new_post.save()
+				self.post = new_post
+				super(PostDraft, self).save(*args, **kwargs) # Call the "real" save() method.
+		else:
+			return 'You are not allowed to overwrite a draft. Please create a new one'
+
+	def publish(self):
+		post = self.post
+		post.title = self.title
+		post.body = self.body
+		self.published = True
+		post.save()
+		return 'Draft has been succesfully published as %s' % (post.title)
+
+class Comment(models.Model):
+	user = models.ForeignKey(User, null=False)
+	body = models.TextField(null=False)
+	post = models.ForeignKey(BlogPost, null=False)
+	created = models.DateTimeField(auto_now_add=True)
+
+	def __unicode__(self):
+		return 'Comment #%s on post " %s "' % (self.pk, self.post.title)
+
+class Reply(models.Model):
+	user = models.ForeignKey(User, null=False)
+	body = models.TextField(null=False)
+	comment = models.ForeignKey(Comment, null=False)
+	created = models.DateTimeField(auto_now_add=True)
+
+	def __unicode__(self):
+		return 'Reply #%s on comment #%s' % (self.pk, self.comment.pk)
+
