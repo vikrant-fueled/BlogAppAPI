@@ -53,9 +53,15 @@ class Comment(models.Model):
 	post = models.ForeignKey(BlogPost, null=False)
 	created = models.DateTimeField(auto_now_add=True)
 
+	def __unicode__(self):
+		return 'Comment #%s on post " %s "' % (self.pk, self.post.title)
+
 class Reply(models.Model):
 	user = models.ForeignKey(User, null=False)
 	body = models.TextField(null=False)
 	comment = models.ForeignKey(Comment, null=False)
 	created = models.DateTimeField(auto_now_add=True)
+
+	def __unicode__(self):
+		return 'Reply #%s on comment #%s' % (self.pk, self.comment.pk)
 
