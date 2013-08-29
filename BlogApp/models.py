@@ -18,5 +18,36 @@ class UserProfile(models.Model):
 	def __unicode__(self):
 		return '%s' % self.user
 
+class BlogPost(models.Model):
+	user = models.ForeignKey(User)
+	title = models.CharField(max_length=200, null=False)
+	created = models.DateTimeField(auto_now_add=True)
+	body = models.TextField(null=False)
+	published = models.BooleanField(default=False)
 
+	def __unicode__(self):
+		return '%s by %s [ Published? : %s ]' % (self.title, self.user, self.published)
+
+class BlogDraft(models.Model):
+	user = models.ForeignKey(User, null=False)
+	post = models.ForeignKey(BlogPost)
+	title = models.CharField(max_length=200, null=False)
+	created = models.DateTimeField(auto_now_add=True)
+	body = models.TextField(null=False)
+
+	def __unicode__(self):
+		return '%s by %s - [Draft date: %s]' % (self.title, self.post.user, self.created)
+
+	def save(self, *args, **kwargs):
+		if hasattr(self, 'post'):
+			super(BlogDraft, self).save(*args, **kwargs) # Call the "real" save() method.
+		else:
+			new_post = BlogPost(user=self.user, title=self.title, body=self.body, published=False)
+			new_post.save()
+			self.post = new_post
+			super(BlogDraft, self).save(*args, **kwargs) # Call the "real" save() method.
+
+class Comment(models.Model):
+	user = models.ForeignKey(User, null=False)
+	body = models.TextField(null=False)
 	
