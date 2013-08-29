@@ -47,5 +47,15 @@ class BlogDraft(models.Model):
 			self.post = new_post
 			super(BlogDraft, self).save(*args, **kwargs) # Call the "real" save() method.
 
+class Comment(models.Model):
+	user = models.ForeignKey(User, null=False)
+	body = models.TextField(null=False)
+	post = models.ForeignKey(BlogPost, null=False)
+	created = models.DateTimeField(auto_now_add=True)
 
+class Reply(models.Model):
+	user = models.ForeignKey(User, null=False)
+	body = models.TextField(null=False)
+	comment = models.ForeignKey(Comment, null=False)
+	created = models.DateTimeField(auto_now_add=True)
 
