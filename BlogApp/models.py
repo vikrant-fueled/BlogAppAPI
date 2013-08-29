@@ -47,7 +47,5 @@ class BlogDraft(models.Model):
 			self.post = new_post
 			super(BlogDraft, self).save(*args, **kwargs) # Call the "real" save() method.
 
-class Comment(models.Model):
-	user = models.ForeignKey(User, null=False)
-	body = models.TextField(null=False)
-	
+
+
