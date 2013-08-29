@@ -122,8 +122,12 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django_extensions',
-    'south', #for schema migrations
+    #'south', #for schema migrations
     'BlogApp',
+)
+
+AUTHENTICATION_BACKENDS = (
+    ('django.contrib.auth.backends.ModelBackend'),
 )
 
 # A sample logging configuration. The only tangible logging

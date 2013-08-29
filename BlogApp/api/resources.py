@@ -1,22 +1,26 @@
 from django.contrib.auth.models import User
 from tastypie.resources import ModelResource
-from tastypie.authentication import BasicAuthentication
-from tastypie.authorization import DjangoAuthorization
+from tastypie.authorization import Authorization
+from tastypie import fields
 
-
+from BlogApp.models import *
 
 class UserResource(ModelResource):
 	class Meta:
 		queryset = User.objects.all()
 		excludes = ['email', 'is_staff', 'is_superuser', 'password']
-		
-		authentication = BasicAuthentication()
-		authorization = DjangoAuthorization()
 
-		def obj_create(self, bundle, request=None, **kwargs):
-			username, password = bundle.data['username'], bundle.data['password']
-    		try:
-        		bundle.obj = User.objects.create_user(username, '', password)
-    		except IntegrityError:
-        		raise BadRequest('That username already exists')
-    		return bundle
+class BlogPostResource(ModelResource):
+	user = fields.ForeignKey(UserResource, 'user')
+
+	class Meta:
+		queryset = BlogPost.objects.all()
+		authorization= Authorization()
+
+class CommentResource(ModelResource):
+	user = fields.ForeignKey(UserResource, 'user')
+	post = fields.ForeignKey(BlogPostResource, 'post')
+
+	class Meta:
+		queryset = Comment.objects.all()
+		authorization= Authorization()

@@ -5,7 +5,7 @@ def user_unicode_edit(self):
     return '%s %s' % (self.first_name, self.last_name)
 
 def user_save_edit(self, *args, **kwargs):
-	self.set_password(self.password)
+	#do something
 	super(User, self).save(*args, **kwargs)
 
 User.__unicode__ = user_unicode_edit
@@ -19,14 +19,14 @@ class UserProfile(models.Model):
 		return '%s' % self.user
 
 class BlogPost(models.Model):
-	user = models.ForeignKey(User)
+	user = models.ForeignKey(User, null=False)
 	title = models.CharField(max_length=200, null=False)
 	created = models.DateTimeField(auto_now_add=True)
 	body = models.TextField(null=False)
 	updated = models.DateTimeField(auto_now=True)
 
 	def __unicode__(self):
-		return '%s by %s [ Published? : %s ]' % (self.title, self.user, self.published)
+		return '%s by %s' % (self.title, self.user)
 
 class PostDraft(models.Model):
 	user = models.ForeignKey(User, null=False)
@@ -44,7 +44,7 @@ class PostDraft(models.Model):
 			if hasattr(self, 'post'):
 				super(PostDraft, self).save(*args, **kwargs) # Call the "real" save() method.
 			else:
-				new_post = BlogPost(user=self.user, title=self.title, body=self.body, published=False)
+				new_post = BlogPost(user=self.user, title=self.title, body=self.body)
 				new_post.save()
 				self.post = new_post
 				super(PostDraft, self).save(*args, **kwargs) # Call the "real" save() method.
