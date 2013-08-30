@@ -1,7 +1,4 @@
 .DS_Store
 *.pyc
 *.sqlite3
-BlogApp/*.pyc
-BlogApp/api/*.pyc
-BlogApp.sqlite3
 BlogApp/migrations

@@ -63,17 +63,12 @@ class Comment(models.Model):
 	user = models.ForeignKey(User, null=False)
 	body = models.TextField(null=False)
 	post = models.ForeignKey(BlogPost, null=False)
+	reply_for = models.ForeignKey('self', null=True)
 	created = models.DateTimeField(auto_now_add=True)
 
 	def __unicode__(self):
-		return 'Comment #%s on post " %s "' % (self.pk, self.post.title)
-
-class Reply(models.Model):
-	user = models.ForeignKey(User, null=False)
-	body = models.TextField(null=False)
-	comment = models.ForeignKey(Comment, null=False)
-	created = models.DateTimeField(auto_now_add=True)
-
-	def __unicode__(self):
-		return 'Reply #%s on comment #%s' % (self.pk, self.comment.pk)
+		if(self.reply_for):
+			return 'Reply to comment #%s on post " %s "' % (self.reply_for.pk, self.post)
+		else:
+			return 'Comment #%s on post " %s "' % (self.pk, self.post.title)
 
