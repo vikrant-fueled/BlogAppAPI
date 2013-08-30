@@ -63,7 +63,7 @@ class Comment(models.Model):
 	user = models.ForeignKey(User, null=False)
 	body = models.TextField(null=False)
 	post = models.ForeignKey(BlogPost, null=False)
-	reply_for = models.ForeignKey('self', null=True)
+	reply_for = models.ForeignKey('self', null=True, related_name='comment_reply')
 	created = models.DateTimeField(auto_now_add=True)
 
 	def __unicode__(self):

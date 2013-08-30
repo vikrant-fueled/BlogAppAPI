@@ -15,6 +15,7 @@ class UserResource(ModelResource):
 
 class BlogPostResource(ModelResource):
 	user = fields.ForeignKey(UserResource, 'user')
+	comments = fields.ToManyField('BlogApp.api.resources.CommentResource', 'comment_set', related_name='comment', full=True)
 
 	class Meta:
 		queryset = BlogPost.objects.all()
@@ -28,6 +29,8 @@ class BlogPostResource(ModelResource):
 class CommentResource(ModelResource):
 	user = fields.ForeignKey(UserResource, 'user')
 	post = fields.ForeignKey(BlogPostResource, 'post')
+	reply_to = fields.ForeignKey('self', 'reply_for', null=True)
+	replies = fields.ToManyField('self', 'comment_reply', null=True)
 
 	class Meta:
 		queryset = Comment.objects.filter()
