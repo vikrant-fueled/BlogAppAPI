@@ -10,7 +10,9 @@ admin.autodiscover()
 api_v1 = Api(api_name='v1')
 api_v1.register(UserResource())
 api_v1.register(BlogPostResource())
+api_v1.register(PostDraftResource())
 api_v1.register(CommentResource())
+api_v1.register(TagResource())
 
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),

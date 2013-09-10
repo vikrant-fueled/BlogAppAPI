@@ -18,12 +18,19 @@ class UserProfile(models.Model):
 	def __unicode__(self):
 		return '%s' % self.user
 
+class Tag(models.Model):
+	name = models.CharField(max_length=20, null=False)
+
+	def __unicode__(self):
+		return self.name
+
 class BlogPost(models.Model):
 	user = models.ForeignKey(User, null=False)
 	title = models.CharField(max_length=200, null=False)
 	created = models.DateTimeField(auto_now_add=True)
 	body = models.TextField(null=False)
 	updated = models.DateTimeField(auto_now=True)
+	tags = models.ManyToManyField(Tag)
 
 	def __unicode__(self):
 		return '%s by %s' % (self.title, self.user)
@@ -35,11 +42,13 @@ class PostDraft(models.Model):
 	created = models.DateTimeField(auto_now_add=True)
 	body = models.TextField(null=False)
 	published = models.BooleanField(default=False)
+	tags = models.ManyToManyField(Tag, null=True)
 
 	def __unicode__(self):
 		return '%s by %s - [Draft date: %s]' % (self.title, self.post.user, self.created)
 
 	def save(self, *args, **kwargs):
+		print "SPECIAL SAVE"
 		if self.pk is None:
 			if hasattr(self, 'post'):
 				super(PostDraft, self).save(*args, **kwargs) # Call the "real" save() method.

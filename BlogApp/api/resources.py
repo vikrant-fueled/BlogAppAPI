@@ -15,7 +15,11 @@ class UserResource(ModelResource):
 
 class BlogPostResource(ModelResource):
 	user = fields.ForeignKey(UserResource, 'user')
-	comments = fields.ToManyField('BlogApp.api.resources.CommentResource', 'comment_set', related_name='comment', full=True)
+	list_allowed_methods = ['get']
+	detail_allowed_methods = ['get']
+	resource_name = 'blogpost'
+	comments = fields.ToManyField('BlogApp.api.resources.CommentResource', 'comment_set', related_name='comment', full=True, null=True)
+	tags = fields.ToManyField('BlogApp.api.resources.TagResource', 'tags', related_name='tag', null=True)
 
 	class Meta:
 		queryset = BlogPost.objects.all()
@@ -24,13 +28,36 @@ class BlogPostResource(ModelResource):
 	      'user': ALL_WITH_RELATIONS,
 	      'title': ALL_WITH_RELATIONS,
 	      'id': ALL_WITH_RELATIONS,
+	      'tag': ALL_WITH_RELATIONS,
+	    }
+
+	def dehydrate(self, bundle):
+	 	bundle.data['user'] = bundle.obj.user
+	 	bundle.data['tags'] = []
+	 	for tag in bundle.obj.tags.all():
+	 		bundle.data['tags'].append(tag.name)
+	 	return bundle
+
+class PostDraftResource(ModelResource):
+	user = fields.ForeignKey(UserResource, 'user')
+
+	class Meta:
+		queryset = PostDraft.objects.all()
+		authorization= Authorization()
+		filtering = {
+	      'user': ALL_WITH_RELATIONS,
+	      'title': ALL_WITH_RELATIONS,
+	      'id': ALL_WITH_RELATIONS,
+	      'tags': ALL_WITH_RELATIONS,
+	      'published': ALL_WITH_RELATIONS,
+	      'post': ALL_WITH_RELATIONS
 	    }
 
 class CommentResource(ModelResource):
 	user = fields.ForeignKey(UserResource, 'user')
 	post = fields.ForeignKey(BlogPostResource, 'post')
 	reply_to = fields.ForeignKey('self', 'reply_for', null=True)
-	replies = fields.ToManyField('self', 'comment_reply', null=True)
+	replies = fields.ToManyField('self', 'comment_reply', null=True, full=True)
 
 	class Meta:
 		queryset = Comment.objects.filter()
@@ -39,3 +66,11 @@ class CommentResource(ModelResource):
 	      'user': ALL_WITH_RELATIONS,
 	      'post': ALL_WITH_RELATIONS,
 	    }
+
+class TagResource(ModelResource):
+	class Meta(object):
+		queryset = Tag.objects.all()
+		authorization= Authorization()
+		filtering = {
+			'name': ALL,
+		}
