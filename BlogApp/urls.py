@@ -1,17 +1,20 @@
 from django.conf.urls import patterns, include, url
+from django.contrib import admin
 
-# Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+from tastypie.api import Api
+
+from BlogApp.api.resources import *
+
+admin.autodiscover()
+
+api_v1 = Api(api_name='v1')
+api_v1.register(UserResource())
+api_v1.register(BlogPostResource())
+api_v1.register(PostDraftResource())
+api_v1.register(CommentResource())
+api_v1.register(TagResource())
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'BlogApp.views.home', name='home'),
-    # url(r'^BlogApp/', include('BlogApp.foo.urls')),
-
-    # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
-    # url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^api/', include(api_v1.urls)),
 )
